@@ -63,6 +63,7 @@ func (ini *IniConfig) parseFile(name string) (*IniConfigContainer, error) {
 	return ini.parseData(filepath.Dir(name), data)
 }
 
+// 解析ini文件，并支持多个section
 func (ini *IniConfig) parseData(dir string, data []byte) (*IniConfigContainer, error) {
 	cfg := &IniConfigContainer{
 		data:           make(map[string]map[string]string),
@@ -139,6 +140,7 @@ func (ini *IniConfig) parseData(dir string, data []byte) (*IniConfigContainer, e
 			continue
 		}
 
+		// 解析section段. 格式: [section_name]
 		if bytes.HasPrefix(line, sectionStart) && bytes.HasSuffix(line, sectionEnd) {
 			section = strings.ToLower(string(line[1 : len(line)-1])) // section name case insensitive
 			if comment.Len() > 0 {
@@ -159,6 +161,7 @@ func (ini *IniConfig) parseData(dir string, data []byte) (*IniConfigContainer, e
 		key := string(bytes.TrimSpace(keyValue[0])) // key name case insensitive
 		key = strings.ToLower(key)
 
+		// 解析include
 		// handle include "other.conf"
 		if len(keyValue) == 1 && strings.HasPrefix(key, "include") {
 
